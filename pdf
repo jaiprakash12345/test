@@ -1,0 +1,10 @@
+     $this->layout = false;
+        $this->autoRender = false;
+ App::import('Vendor', 'mpdf', array('file' => 'mpdf' . DS . 'mpdf.php'));
+        $mpdf = new mPDF('c', 'A4', '', '', 0, 0, 0, 0, 0, 0);
+        $mpdf->useOddEven = 0;
+        $view = new View($this, false);
+        $content = $view->element('test);
+        $mpdf->WriteHTML($content);
+        $mpdf->Output('test.pdf', 'F');
+       
