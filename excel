@@ -1,1 +1,44 @@
 
+   App::import('Vendor', 'PHPExcel');
+        PHPExcel_Cell::setValueBinder(new PHPExcel_Cell_AdvancedValueBinder());
+        $objPHPExcel = new PHPExcel();
+        $HeaderData=array('name','email','age');
+        $ExcelHeader = array();
+        $x = 64;
+        $y = 64;
+        for ($i = 1; $i <= count($HeaderData); $i++) {
+            if ($y == 90) {
+                $x++;
+                $y = 64;
+            }
+            if ($i <= 26)
+                $ExcelHeader[] = chr(++$y);
+            else
+                $ExcelHeader[] = chr($x) . chr(++$y);
+        }
+        $lastArrayElement = end($ExcelHeader);
+        // Create a first sheet, representing sales data
+        $objPHPExcel->createSheet();
+        $objPHPExcel->setActiveSheetIndex(0);
+        $objPHPExcel->getActiveSheet()
+                ->getStyle("A1:" . $lastArrayElement . "1")
+                ->getFill()
+                ->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
+                ->getStartColor()
+                ->setARGB('0-191-255');
+        $objPHPExcel->getActiveSheet()->getStyle("A1:" . $lastArrayElement . "1")->getFont()->setBold(true)
+                ->setName('Verdana')
+                ->getColor()->setRGB('ffffff');
+
+        foreach ($HeaderData as $key => $header) {
+            $objPHPExcel->getActiveSheet()->setCellValue($ExcelHeader[$key] . '1', $header['column']);
+        }
+        $objPHPExcel->getActiveSheet()->setTitle('data');
+        $file = "test.xls";
+        // Redirect output to a client’s web browser (Excel5)
+        ob_clean();
+        header('Content-Type: application/vnd.ms-excel');
+        header("Content-Disposition: attachment;filename=$file");
+        header('Cache-Control: max-age=0');
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        $objWriter->save('php://output');
